@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+{% load static %}
+
+{% block title %}
+  Map Page
+{% endblock %}
+
+{% block map %}
+  <link rel="stylesheet" href="{% static 'css/map/style.css' %}" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+  <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.6.0/Control.FullScreen.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.6.0/Control.FullScreen.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<section class="special-services">
+  <div class="container mb-3">
+    <div class="auto-search-wrapper loupe text-center">
+      <input type="text" autocomplete="off" id="search" placeholder="Nhập vào tên thành phố" />
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div class="row" style="height: 650px">
+      <div id="map"></div>
+    </div>
+    <ul class="layers"></ul>
+  </div>
+  </div>
+</section>
+ 
+{% endblock %}
+
+{% block script %}
+  <script src="{% static 'js/map/script.js' %}"></script>
+  <script src="{% static 'js/map/tim-kiem.js' %}"></script>
+{% endblock %}

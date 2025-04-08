@@ -1,0 +1,136 @@
+{
+    "type": "FeatureCollection",
+    "generator": "custom",
+    "copyright": "The data included in this document is from OpenStreetMap and other sources.",
+    "timestamp": "2025-04-01T00:00:00Z",
+    "features": [
+        {
+            "type": "Feature",
+            "id": "node/001",
+            "properties": {
+                "@id": "node/001",
+                "amenity": "cinema",
+                "name": "Lotte Cinema Gò Vấp"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    106.67139472409848,
+                    10.840042919132673
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "id": "node/002",
+            "properties": {
+                "@id": "node/002",
+                "amenity": "cinema",
+                "name": "CGV Vincom Phan Văn Trị"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    106.68907584640989,
+                    10.82857801807484
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "id": "node/002",
+            "properties": {
+                "@id": "node/002",
+                "amenity": "cinema",
+                "name": "BHD Star Cineplex Quang Trung"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    106.67199553893433,
+                    10.830769871336123
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "id": "node/002",
+            "properties": {
+                "@id": "node/002",
+                "amenity": "cinema",
+                "name": "Galaxy Cinema Quang Trung"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    106.6622966708703,
+                    10.835996533601717
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "id": "node/002",
+            "properties": {
+                "@id": "node/002",
+                "amenity": "cinema",
+                "name": "Beta Cinemas Quang Trung"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    106.66032256498116,
+                    10.837261034957015
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "id": "node/002",
+            "properties": {
+                "@id": "node/002",
+                "amenity": "cinema",
+                "name": "Cinema Rio"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    106.66366996192362,
+                    10.833551815835108
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "id": "node/002",
+            "properties": {
+                "@id": "node/002",
+                "amenity": "cinema",
+                "name": "Penthouse Cinema"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    106.66693152817521,
+                    10.838778429531368
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "id": "node/002",
+            "properties": {
+                "@id": "node/002",
+                "amenity": "cinema",
+                "name": "Penthouse Cinema"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    106.66693152817521,
+                    10.838778429531368
+                ]
+            }
+        }
+    ]
+}
