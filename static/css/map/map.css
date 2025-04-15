@@ -1,156 +1,111 @@
+#map-container {
+    position: relative;
+}
+
 #map {
+    height: 100%;
     width: 100%;
-    height: 100%;
+    z-index: 0;
 }
 
-.sidebar {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    bottom: 10px;
-    width: 500px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    transform: translateX(-110%);
-    transition: transform 0.3s ease;
-    z-index: 1000;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-
-}
-
-.sidebar.open {
-    transform: translateX(0);
-}
-
-.sidebar-content {
-    margin-top: 30px;
-    flex: 1;
-}
-
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-
-.leaflet-left.shifted {
-    transform: translateX(510px);
-
-    transition: transform 0.3s ease;
-}
-
-.user-location .emoji {
-    font-size: 24px;
-}
-
-/* --- Sidebar Styles --- */
 #sidebar {
-    position: fixed;
-    /* Hoặc absolute nếu map container là relative */
-    right: 0;
-    top: 0;
+    position: absolute;
+    top: 80px;
+    /* Nếu có header, điều chỉnh top cho phù hợp */
+    left: 0;
     width: 300px;
-    /* Điều chỉnh độ rộng tùy ý */
-    max-width: 80%;
-    /* Giới hạn độ rộng trên màn hình nhỏ */
-    height: 100%;
+    /* Chỉnh kích thước của sidebar */
+    height: calc(100% - 80px);
+    /* Tính chiều cao sidebar sau header */
     background-color: white;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
-    z-index: 1001;
-    /* Phải cao hơn z-index của map controls */
+    z-index: 1000;
+    padding: 10px;
     overflow-y: auto;
-    /* Cho phép cuộn nếu nội dung dài */
-    padding: 15px;
-    box-sizing: border-box;
-    transition: transform 0.3s ease-in-out;
-    /* Hiệu ứng trượt */
-    transform: translateX(0);
-    /* Vị trí mặc định khi hiển thị */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
 }
 
-#sidebar.sidebar-hidden {
-    transform: translateX(100%);
-    /* Trượt ra khỏi màn hình bên phải */
-    /* Hoặc dùng display: none; nếu không cần hiệu ứng */
-    /* display: none; */
-    box-shadow: none;
+
+#sidebar {
+    background-color: rgba(255, 255, 255, 0.9);
+    /* Nền sidebar trắng mờ */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Đổ bóng cho sidebar */
+    padding-top: 20px;
+    /* Thêm padding trên cùng để không bị dính vào nút đóng */
 }
 
 #sidebar-close-btn {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    font-size: 1.5em;
-    background: none;
+    font-size: 36px;
+    /* Tăng kích thước chữ của nút "X" */
+    color: white;
+    /* Màu chữ trắng */
+    background-color: red;
+    /* Nền đỏ cho nút */
     border: none;
+    /* Xóa đường viền */
+    padding: 10px 15px;
+    /* Tăng kích thước padding */
     cursor: pointer;
-    padding: 5px;
-    line-height: 1;
-    color: #555;
+    /* Con trỏ chuột khi hover lên nút */
+    position: absolute;
+    /* Đặt nút ở góc trên bên phải */
+    top: 10px;
+    /* Cách lề trên 10px */
+    right: 10px;
+    /* Cách lề phải 10px */
+    border-radius: 50%;
+    /* Làm tròn góc nút */
+    z-index: 1100;
+    /* Đảm bảo nút nằm trên các phần tử khác */
 }
 
 #sidebar-close-btn:hover {
-    color: #000;
+    background-color: darkred;
+    /* Thay đổi màu nền khi hover */
+    color: white;
+    /* Màu chữ vẫn giữ trắng khi hover */
 }
 
-#sidebar-content h3 {
-    margin-top: 10px;
-    margin-bottom: 5px;
+#sidebar-content {
+    padding: 20px;
+    font-size: 1em;
+    color: #333;
+    /* Màu chữ */
+    line-height: 1.6;
+    /* Khoảng cách dòng cho dễ đọc */
+    overflow-y: auto;
+}
+
+/* Căn chỉnh các phần tử trong sidebar */
+#sidebar-content b {
     font-size: 1.2em;
+    /* Làm chữ in đậm rõ ràng hơn */
 }
 
 #sidebar-content em {
-    font-size: 0.9em;
-    color: #666;
-    display: block;
-    margin-bottom: 10px;
+    font-style: italic;
+    /* In nghiêng cho các đoạn mô tả */
 }
 
-#sidebar-content p {
-    font-size: 0.95em;
-    margin-bottom: 15px;
-}
-
-#sidebar-content label {
-    font-weight: bold;
-}
-
-#sidebar-content select {
-    width: 100%;
-    padding: 5px;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
-
+/* Căn chỉnh nút "Chỉ đường" */
 #sidebar-content button {
-    padding: 8px 15px;
-    cursor: pointer;
-    background-color: #4285F4;
+    background-color: #007bff;
+    /* Màu nền của nút */
     color: white;
+    /* Màu chữ của nút */
+    padding: 10px 15px;
+    /* Padding của nút */
     border: none;
-    border-radius: 4px;
+    /* Xóa đường viền */
+    border-radius: 5px;
+    /* Bo tròn góc của nút */
+    cursor: pointer;
+    /* Con trỏ chuột khi hover */
     margin-top: 15px;
+    /* Cách nút một khoảng từ các phần trên */
 }
 
 #sidebar-content button:hover {
-    background-color: #357ae8;
-}
-
-#sidebar-content #movie-detail {
-    /* Đổi id nếu cần */
-    margin-top: 10px;
-    font-size: 0.9em;
-    border-top: 1px solid #eee;
-    padding-top: 10px;
+    background-color: #0056b3;
+    /* Thay đổi màu nền khi hover */
 }

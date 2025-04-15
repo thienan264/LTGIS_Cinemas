@@ -15,7 +15,39 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.6.0/Control.FullScreen.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.6.0/Control.FullScreen.min.js"></script>
 {% endblock %}
+<style>
+  #sidebar-close-btn {
+    font-size: 36px;
+    /* Tăng kích thước chữ của nút "X" */
+    color: white;
+    /* Màu chữ trắng */
+    background-color: red;
+    /* Nền đỏ cho nút */
+    border: none;
+    /* Xóa đường viền */
+    padding: 10px 15px;
+    /* Tăng kích thước padding */
+    cursor: pointer;
+    /* Con trỏ chuột khi hover lên nút */
+    position: absolute;
+    /* Đặt nút ở góc trên bên phải */
+    top: 10px;
+    /* Cách lề trên 10px */
+    right: 10px;
+    /* Cách lề phải 10px */
+    border-radius: 50%;
+    /* Làm tròn góc nút */
+    z-index: 1100;
+    /* Đảm bảo nút nằm trên các phần tử khác */
+}
 
+#sidebar-close-btn:hover {
+    background-color: darkred;
+    /* Thay đổi màu nền khi hover */
+    color: white;
+    /* Màu chữ vẫn giữ trắng khi hover */
+}
+</style>
 {% block content %}
 <section class="special-services">
   <div class="container mb-3">
@@ -24,20 +56,26 @@
     </div>
   </div>
 
-  <div class="container-fluid">
-    <div class="row" style="height: 650px">
-      <div id="map">
-        <div id="sidebar" class="sidebar-hidden">
-          <button id="sidebar-close-btn" title="Đóng">&times;</button>
-          <div id="sidebar-content">
-              </div>
-      </div>
+  <div class="container-fluid" style="position: relative;">
+    
+  
+      <!-- Bản đồ chiếm phần còn lại của chiều rộng -->
+      <div id="map" style="height: 100%; width: 100%;">
+        <div class="row" style="height: 650px;" id="map-container-">
+          <!-- Sidebar nằm bên phải -->
+          <div id="sidebar" style="display: none; position: absolute; top: 0; right: 0; width: 300px; height: 100%; z-index: 1000; background: rgba(255, 255, 255, 0.9); overflow-y: auto;">
+            <!-- Nút đóng sidebar -->
+            <button id="sidebar-close-btn" title="Đóng">&times;</button>
+            
+            <!-- Nội dung của sidebar -->
+            <div id="sidebar-content" style="padding: 20px; font-family: Arial, sans-serif;"></div>
+          </div>
       </div>
     </div>
-    <ul class="layers"></ul>
-  </div>
   </div>
 </section>
+
+
  
 {% endblock %}
 
