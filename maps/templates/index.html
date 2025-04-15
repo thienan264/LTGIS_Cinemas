@@ -26,7 +26,13 @@
 
   <div class="container-fluid">
     <div class="row" style="height: 650px">
-      <div id="map"></div>
+      <div id="map">
+        <div id="sidebar" class="sidebar-hidden">
+          <button id="sidebar-close-btn" title="Đóng">&times;</button>
+          <div id="sidebar-content">
+              </div>
+      </div>
+      </div>
     </div>
     <ul class="layers"></ul>
   </div>
@@ -36,6 +42,5 @@
 {% endblock %}
 
 {% block script %}
-  <script src="{% static 'js/map/script.js' %}"></script>
-  <script src="{% static 'js/map/tim-kiem.js' %}"></script>
+<script type="module" src="{% static 'js/cinemas/main.js' %}"></script>
 {% endblock %}

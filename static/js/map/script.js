@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 /**
- * control layers outside the map
+ * control layers inside the map
  */
 
 // config map
@@ -9,27 +9,23 @@ let config = {
   maxZoom: 18,
   fullscreenControl: true
 };
-// magnification with which the map will start
+
 const zoom = 18;
-// co-ordinates
 const lat = 10.8231;
 const lng = 106.6297;
 
-// calling map
 const map = L.map("map", config).setView([lat, lng], zoom);
 
-// Used to load and display tile layers on the map
-// Most tile servers require attribution, which you can set under `Layer`
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-// Tạo biến để lưu trữ marker vị trí của người dùng
 let userLocationMarker;
 let userLocationCircle;
+let nearestCinemaLayer = null;
+let nearestCinemaRouting = null;
 
-// Thêm nút hiển thị vị trí người dùng
 const locationButton = L.control({ position: 'topleft' });
 locationButton.onAdd = function () {
   const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
@@ -46,38 +42,27 @@ locationButton.onAdd = function () {
 };
 locationButton.addTo(map);
 
-// Hàm lấy vị trí hiện tại của người dùng
 function getCurrentLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
-      // Thành công
       function (position) {
         const userLat = position.coords.latitude;
         const userLng = position.coords.longitude;
         const accuracy = position.coords.accuracy;
 
-        // Xóa marker và circle cũ nếu đã tồn tại
-        if (userLocationMarker) {
-          map.removeLayer(userLocationMarker);
-        }
-        if (userLocationCircle) {
-          map.removeLayer(userLocationCircle);
-        }
+        if (userLocationMarker) map.removeLayer(userLocationMarker);
+        if (userLocationCircle) map.removeLayer(userLocationCircle);
 
-        // Tạo marker vị trí người dùng
         userLocationMarker = L.marker([userLat, userLng], {
           icon: L.divIcon({
-            className: 'user-location',  // Thêm lớp CSS để tạo kiểu
-            html: "<span class='emoji'>📍</span>",  // Biểu tượng vị trí người dùng
-            iconSize: [40, 40],  // Điều chỉnh kích thước tổng thể của icon
-            iconAnchor: [20, 20],  // Căn giữa icon (x,y vị trí giữa của icon)
-            popupAnchor: [0, -25],  // Điều chỉnh vị trí popup
+            className: 'user-location',
+            html: "<span class='emoji'>📍</span>",
+            iconSize: [40, 40],
+            iconAnchor: [20, 20],
+            popupAnchor: [0, -25],
           })
-        }).addTo(map)
-          .bindPopup('Vị trí của bạn')
-          .openPopup();
+        }).addTo(map).bindPopup('Vị trí của bạn').openPopup();
 
-        // Tạo circle hiển thị độ chính xác
         userLocationCircle = L.circle([userLat, userLng], {
           radius: accuracy,
           color: '#4285F4',
@@ -85,44 +70,29 @@ function getCurrentLocation() {
           fillOpacity: 0.15
         }).addTo(map);
 
-        // Di chuyển map đến vị trí người dùng
         map.setView([userLat, userLng], zoom);
       },
-      // Lỗi
       function (error) {
         let errorMessage;
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = 'Người dùng đã từ chối yêu cầu truy cập vị trí.';
-            break;
+            errorMessage = 'Người dùng đã từ chối yêu cầu truy cập vị trí.'; break;
           case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Thông tin vị trí không có sẵn.';
-            break;
+            errorMessage = 'Thông tin vị trí không có sẵn.'; break;
           case error.TIMEOUT:
-            errorMessage = 'Yêu cầu lấy vị trí người dùng đã hết thời gian.';
-            break;
-          case error.UNKNOWN_ERROR:
-            errorMessage = 'Đã xảy ra lỗi không xác định.';
-            break;
+            errorMessage = 'Yêu cầu lấy vị trí người dùng đã hết thời gian.'; break;
+          default:
+            errorMessage = 'Đã xảy ra lỗi không xác định.'; break;
         }
         alert(errorMessage);
       },
-      // Tùy chọn
-      {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0
-      }
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     );
   } else {
     alert('Trình duyệt của bạn không hỗ trợ định vị.');
   }
 }
 
-// ------------------------------------------------------------
-
-// async function to load geojson
-// Fetch dữ liệu GeoJSON từ API (lấy từ database qua Django)
 async function fetchData(url) {
   try {
     const response = await fetch(url);
@@ -133,32 +103,47 @@ async function fetchData(url) {
   }
 }
 
-// Nhóm layer hiển thị các POI
 const poiLayers = L.layerGroup().addTo(map);
-
-// Khi nhấn vào marker -> zoom vào
 function clickZoom(e) {
   map.setView(e.target.getLatLng(), zoom);
 }
 
-const layersContainer = document.querySelector(".layers");
 const layersButton = "all layers";
-const arrayLayers = ["cinema"]; // danh sách layer
+const arrayLayers = ["cinema", "nearest"];
 
-// Tạo checkbox cho từng lớp
+const layerControl = L.control({ position: 'topright' });
+layerControl.onAdd = function () {
+  const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control custom-layer-control');
+  div.innerHTML = `
+    <a href="#" title="Lớp hiển thị" style="font-size: 18px;">🗂️</a>
+    <div class="layer-dropdown" style="display:none; background:white; padding: 5px; border-radius: 4px; margin-top: 5px;">
+      <ul id="layer-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+    </div>
+  `;
+  div.onclick = function (e) {
+    e.stopPropagation();
+    const dropdown = div.querySelector('.layer-dropdown');
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+  };
+  L.DomEvent.disableClickPropagation(div);
+  return div;
+};
+layerControl.addTo(map);
+
 function generateButton(name) {
   const id = name === layersButton ? "all-layers" : name;
+  const container = document.getElementById("layer-list");
 
   const templateLayer = `
-    <li class="layer-element">
+    <li class="layer-element" style="margin-bottom: 5px;">
       <label for="${id}">
-        <input type="checkbox" id="${id}" name="item" class="item" value="${name}" checked>
+        <input type="checkbox" id="${id}" name="item" class="item" value="${name}">
         <span>${name}</span>
       </label>
     </li>
   `;
 
-  layersContainer.insertAdjacentHTML("beforeend", templateLayer);
+  container.insertAdjacentHTML("beforeend", templateLayer);
 
   const checkbox = document.querySelector(`#${id}`);
   checkbox.addEventListener("change", (e) => {
@@ -167,26 +152,21 @@ function generateButton(name) {
 }
 
 generateButton(layersButton);
+arrayLayers.forEach((layerName) => {
+  generateButton(layerName);
 
-// Tải dữ liệu từ Django API
-arrayLayers.map((cinema) => {
-  generateButton(cinema);
-
-  // ✅ Đường dẫn đúng theo Django URL patterns
-  fetchData(`/maps/api/geojson/${cinema}/`)
-    .then((data) => {
-      if (!data) return; // kiểm tra có dữ liệu không
+  if (layerName !== "nearest") {
+    fetchData(`/maps/api/geojson/${layerName}/`).then((data) => {
+      if (!data) return;
       const layer = L.geoJSON(data, geojsonOpts).addTo(map);
-      window["layer_" + cinema] = layer;
+      window["layer_" + layerName] = layer;
     });
+  }
 });
 
-// Xử lý khi checkbox được nhấn
-document.addEventListener("click", (e) => {
-  const target = e.target;
-  const itemInput = target.closest(".item");
-  if (!itemInput) return;
-  showHideLayer(target);
+document.addEventListener("click", function () {
+  const dropdown = document.querySelector(".layer-dropdown");
+  if (dropdown) dropdown.style.display = "none";
 });
 
 function showHideLayer(target) {
@@ -199,18 +179,21 @@ function showHideLayer(target) {
   } else {
     checkedType(id, target.checked);
   }
-
-  const checkedBoxes = document.querySelectorAll("input[name=item]:checked");
-  document.querySelector("#all-layers").checked =
-    checkedBoxes.length === arrayLayers.length;
 }
 
 function checkedType(id, type) {
-  const layer = window["layer_" + id];
-  if (!layer) {
-    console.warn(`Layer "${id}" chưa load xong!`);
+  if (id === "nearest") {
+    if (type) {
+      showNearestCinema();
+    } else {
+      if (nearestCinemaLayer) map.removeLayer(nearestCinemaLayer);
+      if (nearestCinemaRouting) map.removeControl(nearestCinemaRouting);
+    }
     return;
   }
+
+  const layer = window["layer_" + id];
+  if (!layer) return;
 
   if (type) {
     map.addLayer(layer);
@@ -218,31 +201,62 @@ function checkedType(id, type) {
   } else {
     map.removeLayer(layer);
   }
-
-  document.querySelector(`#${id}`).checked = type;
 }
 
+function showNearestCinema() {
+  if (!navigator.geolocation) {
+    alert("Trình duyệt không hỗ trợ định vị.");
+    return;
+  }
 
-// Thêm thư viện Leaflet Routing Machine nếu chưa có
-// < link rel = "stylesheet" href = "https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-//   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-let routingControl; // Biến lưu tuyến đường
-// Hàm chỉ đường từ vị trí hiện tại đến một điểm đích (rạp chiếu phim)
+  navigator.geolocation.getCurrentPosition(function (position) {
+    const userLatLng = [position.coords.latitude, position.coords.longitude];
+    let nearestLayer = null;
+    let minDistance = Infinity;
+
+    window["layer_cinema"].eachLayer(function (layer) {
+      const cinemaLatLng = layer.getLatLng();
+      const distance = map.distance(userLatLng, cinemaLatLng);
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestLayer = layer;
+      }
+    });
+
+    if (nearestLayer) {
+      if (nearestCinemaLayer) map.removeLayer(nearestCinemaLayer);
+      if (nearestCinemaRouting) map.removeControl(nearestCinemaRouting);
+
+      const nearestFeature = nearestLayer.feature;
+      nearestCinemaLayer = L.geoJSON(nearestFeature, geojsonOpts).addTo(map);
+      map.setView(nearestLayer.getLatLng(), 15);
+      nearestCinemaLayer.openPopup();
+
+      nearestCinemaRouting = L.Routing.control({
+        waypoints: [L.latLng(userLatLng), nearestLayer.getLatLng()],
+        routeWhileDragging: false,
+        createMarker: () => null,
+      }).addTo(map);
+    } else {
+      alert("Không tìm thấy rạp nào gần bạn.");
+    }
+  }, function () {
+    alert("Không thể lấy vị trí hiện tại của bạn.");
+  });
+}
+
+let routingControl;
 function routeToDestination(destination) {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       function (position) {
         const userLat = position.coords.latitude;
         const userLng = position.coords.longitude;
-        // Xóa tuyến đường cũ nếu có
-        if (routingControl) {
-          map.removeControl(routingControl);
-        }
-        //Tạo tuyến đường mới
+        if (routingControl) map.removeControl(routingControl);
         routingControl = L.Routing.control({
-          waypoints: [L.latLng(userLat, userLng), destination], // Từ vị trí người dùng đến rạp
+          waypoints: [L.latLng(userLat, userLng), destination],
           routeWhileDragging: true,
-          createMarker: function () { return null; }, // Không hiển thị marker mặc định
+          createMarker: () => null,
         }).addTo(map);
       },
       function () {
@@ -255,7 +269,6 @@ function routeToDestination(destination) {
   }
 }
 
-// Cập nhật sự kiện click trên rạp chiếu phim
 geojsonOpts = {
   pointToLayer: function (feature, latlng) {
     return L.marker(latlng, {
@@ -278,8 +291,7 @@ geojsonOpts = {
             ${lichChieu.map((item, index) =>
           `<option value="${index}">
                 ${item.ten_phim} (${item.gio_chieu})
-              </option>`
-        ).join("")}
+              </option>`).join("")}
           </select>
           <div id="movie-detail-${feature.id}" style="margin-top: 10px; font-size: 0.9em;"></div>
         `;
@@ -299,27 +311,3 @@ geojsonOpts = {
     });
   },
 };
-
-// Xử lý dropdown chọn phim
-
-function handleMovieSelect(event, featureId) {
-  const index = event.target.value;
-  const detailDiv = document.getElementById(`movie-detail-${featureId}`);
-  const feature = geojsonLayer.getLayer(featureId)?.feature;
-
-  if (!feature || !feature.properties.lich_chieu || index === "") {
-    detailDiv.innerHTML = "";
-    return;
-  }
-
-  const item = feature.properties.lich_chieu[index];
-  detailDiv.innerHTML = `
-    <b>${item.ten_phim}</b><br>
-    Thể loại: ${item.the_loai}<br>
-    Thời lượng: ${item.thoi_luong} phút<br>
-    🕒 Giờ chiếu: ${item.gio_chieu}
-  `;
-}
-
-
-

@@ -11,6 +11,9 @@
     </title>
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+
+
 
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon/boy.png' %}" />
@@ -35,11 +38,13 @@
 
       {% endblock %}
     </main>
-    <div style="height: 100px;"></div>
+
+    <div style="height: 200px;"></div>
+
     {% include 'footer.html' %}
 
     {% load static %}
-
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
     <script src="{% static 'js/vendor/jquery-1.12.4.min.js' %}"></script>
     <script src="{% static 'js/popper.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
