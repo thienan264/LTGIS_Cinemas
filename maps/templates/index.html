@@ -49,31 +49,73 @@
 }
 </style>
 {% block content %}
-<section class="special-services">
-  <div class="container mb-3">
-    <div class="auto-search-wrapper loupe text-center">
-      <input type="text" autocomplete="off" id="search" placeholder="Nhập vào tên thành phố" />
-    </div>
+<div id="map" style="height: 650px; width: 100%; position: relative;">
+  <!-- Tìm kiếm nổi trên bản đồ -->
+  <div class="cinema-search-overlay" style="
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+    width: 90%;
+    max-width: 400px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.7); /* Giúp thanh tìm kiếm nổi lên trên */
+    border-radius: 5px;
+  ">
+    <input
+      type="text"
+      autocomplete="off"
+      id="cinema-search"
+      placeholder="🔍 Tìm kiếm rạp chiếu phim"
+      style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);"
+    />
+    <div
+      id="search-results"
+      class="autocomplete-results"
+      style="
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ccc;
+        z-index: 9999;
+        max-height: 200px;
+        overflow-y: auto;
+        text-align: left;
+        border-radius: 0 0 5px 5px;
+      "
+    ></div>
   </div>
 
-  <div class="container-fluid" style="position: relative;">
-    
-  
-      <!-- Bản đồ chiếm phần còn lại của chiều rộng -->
-      <div id="map" style="height: 100%; width: 100%;">
-        <div class="row" style="height: 650px;" id="map-container-">
-          <!-- Sidebar nằm bên phải -->
-          <div id="sidebar" style="display: none; position: absolute; top: 0; right: 0; width: 300px; height: 100%; z-index: 1000; background: rgba(255, 255, 255, 0.9); overflow-y: auto;">
-            <!-- Nút đóng sidebar -->
-            <button id="sidebar-close-btn" title="Đóng">&times;</button>
-            
-            <!-- Nội dung của sidebar -->
-            <div id="sidebar-content" style="padding: 20px; font-family: Arial, sans-serif;"></div>
-          </div>
-      </div>
-    </div>
+  <!-- Sidebar nằm bên phải -->
+  <div
+    id="sidebar"
+    style=" 
+      display: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 300px;
+      height: 100%;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      overflow-y: auto;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    "
+  >
+    <!-- Nút đóng sidebar -->
+  <!-- Nút đóng sidebar -->
+  <button id="sidebar-close-btn" title="Đóng">&times;</button>
+
+    <!-- Nội dung của sidebar -->
+    <div id="sidebar-content" style="padding: 20px; font-family: Arial, sans-serif;"></div>
   </div>
-</section>
+</div>
+
+
+
 
 
  
@@ -82,3 +124,4 @@
 {% block script %}
 <script type="module" src="{% static 'js/cinemas/main.js' %}"></script>
 {% endblock %}
+  

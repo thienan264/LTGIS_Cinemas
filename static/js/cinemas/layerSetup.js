@@ -1,16 +1,16 @@
 // layerSetup.js
 import { map } from './mapCore.js';
-import { zoom } from './mapConfig.js';
+import { setCinemaLookup } from './cinemaSearch.js';
 
 document.getElementById("sidebar-close-btn").addEventListener("click", () => {
     document.getElementById("sidebar").style.display = "none";  // Ẩn sidebar khi click nút đóng
 });
 
 function handleMovieSelect(event, featureId) {
-    const selectedIndex = event.target.value;
+    const selectedName = event.target.value;
     const detailDiv = document.getElementById(`movie-detail-${featureId}`);
 
-    // Tìm feature từ map (không phụ thuộc vào popup đang mở)
+    // Tìm feature từ map
     let currentFeature = null;
     map.eachLayer(layer => {
         if (layer instanceof L.Marker && layer.feature && layer.feature.id == featureId) {
@@ -19,15 +19,19 @@ function handleMovieSelect(event, featureId) {
     });
 
     const lichChieu = currentFeature?.properties?.lich_chieu || [];
-    if (selectedIndex === "" || !currentFeature) {
+    if (selectedName === "" || !currentFeature) {
         detailDiv.innerHTML = ""; // Clear details
     } else {
-        const movie = lichChieu[parseInt(selectedIndex, 10)];
-        if (movie) {
+        const matchingMovies = lichChieu.filter(item => item.ten_phim === selectedName);
+        if (matchingMovies.length > 0) {
+            const first = matchingMovies[0];
             detailDiv.innerHTML = `
-                <b>Phim:</b> ${movie.ten_phim}<br>
-                <b>Giờ chiếu:</b> ${movie.gio_chieu}<br>
-                <b>Thể loại:</b> ${movie.the_loai}<br>
+                <b>Phim:</b> ${first.ten_phim}<br>
+                <b>Thể loại:</b> ${first.the_loai}<br>
+                <b>Các suất chiếu:</b>
+                <ul style="margin-top: 5px;">
+                    ${matchingMovies.map(m => `<li>${m.gio_chieu}</li>`).join("")}
+                </ul>
             `;
         } else {
             detailDiv.innerHTML = "<em>Không có thông tin chi tiết.</em>";
@@ -35,9 +39,12 @@ function handleMovieSelect(event, featureId) {
     }
 }
 
-// Khi click vào marker, hiển thị sidebar
+const cinemaLookup = {};
+
 var geojsonOpts = {
     pointToLayer: function (feature, latlng) {
+        cinemaLookup[feature.properties.name] = { latlng, feature };
+
         return L.marker(latlng, {
             icon: L.divIcon({
                 className: "cinema-icon",
@@ -53,11 +60,13 @@ var geojsonOpts = {
 
             let dropdownHtml = "<em>Chưa có lịch chiếu</em>";
             if (lichChieu.length > 0) {
+                const uniqueMovies = [...new Set(lichChieu.map(item => item.ten_phim))];
+
                 dropdownHtml = `
                     <label for="movie-select-${feature.id}"><b>Danh sách phim:</b></label><br>
                     <select id="movie-select-${feature.id}">
-                        <option value="">-- Phim đang chiếu --</option>
-                        ${lichChieu.map((item, index) => `<option value="${index}">${item.ten_phim} (${item.gio_chieu})</option>`).join("")}
+                        <option value="">-- Chọn phim --</option>
+                        ${uniqueMovies.map(name => `<option value="${name}">${name}</option>`).join("")}
                     </select>
                     <div id="movie-detail-${feature.id}" style="margin-top: 10px; font-size: 0.9em;"></div>
                 `;
@@ -73,11 +82,9 @@ var geojsonOpts = {
                 <button onclick="window.routeToDestination([${latlng.lat}, ${latlng.lng}])">Chỉ đường</button>
             `;
 
-            // Hiển thị sidebar
             document.getElementById("sidebar-content").innerHTML = sidebarContent;
             document.getElementById("sidebar").style.display = "block";
 
-            // ✅ Gán sự kiện onchange sau khi nội dung đã render
             const selectEl = document.getElementById(`movie-select-${feature.id}`);
             if (selectEl) {
                 selectEl.addEventListener("change", (event) => handleMovieSelect(event, feature.id));
@@ -86,8 +93,9 @@ var geojsonOpts = {
     },
 };
 
-// Gán vào window để các file khác (nearestCinema) có thể truy cập
+
+
 window.geojsonOpts = geojsonOpts;
 window.handleMovieSelect = handleMovieSelect;
-
+setCinemaLookup(cinemaLookup);
 console.log("Layer setup (geojsonOpts) done.");

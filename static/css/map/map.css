@@ -109,3 +109,23 @@
     background-color: #0056b3;
     /* Thay đổi màu nền khi hover */
 }
+
+/* Các mục trong dropdown */
+#search-results div {
+    padding: 8px;
+    border: 1px solid #ddd;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Màu nền khi hover */
+#search-results div:hover {
+    background-color: #e0e0e0;
+}
+
+/* Màu nền khi mục được chọn */
+#search-results div.selected {
+    background-color: #f0f0f0;
+    color: #000;
+}
